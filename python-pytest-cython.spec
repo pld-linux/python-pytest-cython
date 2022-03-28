@@ -1,20 +1,20 @@
 #
 # Conditional build:
 %bcond_without	doc	# Sphinx documentation
-%bcond_with	tests	# unit tests (one failing on py3)
+%bcond_without	tests	# unit tests (failed for python3)
 %bcond_without	python2 # CPython 2.x module
-%bcond_without	python3 # CPython 3.x module
+%bcond_with	python3 # CPython 3.x module (built from python3-pytest-cython.spec)
 
 Summary:	Plugin for testing Cython extension modules
 Summary(pl.UTF-8):	Wtyczka do testowania modułów rozszerzeń Cythona
 Name:		python-pytest-cython
+# keep 0.1.x here for python2 support
 Version:	0.1.1.post0
 Release:	2
 License:	MIT
 Group:		Libraries/Python
 #Source0Download: https://pypi.org/simple/pytest-cython/
-#Source0:	https://files.pythonhosted.org/packages/source/p/pytest-cython/pytest-cython-%{version}.tar.gz
-Source0:	https://files.pythonhosted.org/packages/45/12/39dba6aae3257d762ef56b0667971e71544ab1932825839666152c744c1e/pytest-cython-%{version}.tar.gz
+Source0:	https://files.pythonhosted.org/packages/source/p/pytest-cython/pytest-cython-%{version}.tar.gz
 # Source0-md5:	f24330785e961eed5f9a40716a977bae
 URL:		https://pypi.org/project/pytest-cython/
 %{?with_tests:BuildRequires:	libstdc++-devel}
@@ -37,8 +37,8 @@ BuildRequires:	python3-pytest >= 2.7.3
 BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.714
 %if %{with doc}
-BuildRequires:	python3-Sphinx >= 1.3
-BuildRequires:	python3-sphinx_py3doc_enhanced_theme
+BuildRequires:	python-sphinx_py3doc_enhanced_theme
+BuildRequires:	sphinx-pdg-2 >= 1.3
 %endif
 Requires:	python-modules >= 1:2.6
 BuildArch:	noarch
@@ -110,9 +110,10 @@ PYTHONPATH=$(pwd)/src \
 %endif
 
 %if %{with doc}
-cd docs
-PYTHONPATH=$(pwd)/../src \
-%{__python3} -m sphinx -W . build/html
+#cd docs
+PYTHONPATH=$(pwd)/src \
+sphinx-build-2 docs docs/build/html
+#%{__python3} -m sphinx . build/html
 %endif
 
 %install
